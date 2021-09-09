@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="resetsheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <title>TO DO リスト</title>
+</head>
+
+<body>
+  <!-- コンテンツ表示画面 -->
+  <div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+<div class="content">
+  
+<h1>TO DO リスト</h1>
+  <div id=wrapper>
+    <!-- 分類入力 -->
+    <ul>
+      <li>分類<select id=select>
+      <option>すぐやる</option>
+      <option>今日中</option>
+      <option>3日以内</option>
+      <option>今週中</option>
+      <option>その他</option>
+      </select></li>
+  
+    <!-- TO DO リスト入力 -->
+    
+      <li>TO DO</li>
+      <li><textarea name="" id="text" cols="50" rows="1"></textarea></li>
+    </ul>
+
+    <!-- 保存ボタン -->
+    <button id="send">保存</button>
+    <button id="delete">削除</button>
+
+  </div>
+
+  <div>
+    <!-- 保存されたデータが表示される箇所 -->
+    <div id="output"></div>
+  </div>
+
+
+
+  <!--/ コンテンツ表示画面 -->
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- JQuery -->
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#config-web-app -->
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyBJnEB8xQSAGUexB3EomVv80YH1YVT2AB4",
+      authDomain: "dev21chart.firebaseapp.com",
+      databaseURL: "https://dev21chart-default-rtdb.firebaseio.com/",
+      projectId: "dev21chart",
+      storageBucket: "dev21chart.appspot.com",
+      messagingSenderId: "479853585805",
+      appId: ""
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    //firebaseのデーターベース（保存させる場所）を使いますよ
+    const newPostRef = firebase.database().ref();
+
+    // ここから下にjqueryの処理を書いて練習します
+
+    // 送信ボタンをクリックされたら次の処理をする
+    $("#send").on("click", function () {
+      // データを登録で送る
+      newPostRef.push({
+        select: $("select").val(), //分類
+        text: $("#text").val(), //テキストエリア
+      })
+      $("#select").val(""); //空にする
+      $("#text").val(""); //空にする
+    });
+    
+    // 削除ボタンをクリックされたら次の処理をする
+    //  $("#delete").on("click", function () {
+
+    //   const snapshot =db.collection("dev21chart").get();
+    //     snapshot.forEach(doc=>{
+    //       console.log(doc.id,'=>',doc.data());
+    //     });
+    // newPostRef.delete({
+      
+      
+    // })
+    //  });
+
+    
+
+
+
+    // 受信処理
+    newPostRef.on("child_added", function (data) {
+      let v = data.val(); //ここに保存されたデータが全て入ってくる
+      // let k = data.key; //今回は使いません
+
+      console.log(v); //vの変数に入っているオブジェクトを全てみる
+
+      let str = `<tr><th>${v.select}</th><td>${v.text}</td><td><input type="checkbox"></td></tr>`;
+
+      // ここでデータをhtmlに埋め込む
+      $("#output").prepend(str);
+    })
+
+    $("#text").on("keydown", function (e) {
+      console.log(e, "event");
+
+      // エンターキーを押したら送信処理を実行
+      if (e.keyCode === 13) {
+        newPostRef.push({
+          username: $("#select").val(), //名前
+          text: $("#text").val(), //テキストエリア
+        })
+        $("#text").val(""); //空にする
+        $("#select").val(""); //空にする
+      }
+    })
+  </script>
+</body>
+
+</html>
